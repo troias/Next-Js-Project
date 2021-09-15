@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import MeetupList from "../components/meetups/MeetupList";
 import Layout from "../components/layout/Layout";
 
@@ -36,7 +36,10 @@ export const getStaticProps = async (ctx) => {
   return {
     props:{
       meetups: dummyMeetups
-    }
+    }, 
+    revalidate: 36000,
   }
 }
+
+
 export default HomePage;
