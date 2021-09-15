@@ -23,9 +23,9 @@ const dummyMeetups = [
 
 const HomePage = () => {
   return (
-    <Layout>
+    <>
       <MeetupList meetups={dummyMeetups} />
-    </Layout>
+    </>
   );
 };
 
