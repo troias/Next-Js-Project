@@ -1,4 +1,4 @@
-import React from "react";
+import {useState, useEffect} from "react";
 import MeetupList from "../components/meetups/MeetupList";
 import Layout from "../components/layout/Layout";
 
@@ -21,12 +21,22 @@ const dummyMeetups = [
   },
 ];
 
-const HomePage = () => {
+const HomePage = (props) => {
+
   return (
     <>
-      <MeetupList meetups={dummyMeetups} />
+      <MeetupList meetups={props.meetups} />
     </>
   );
 };
 
+export const getStaticProps = async (ctx) => {
+
+
+  return {
+    props:{
+      meetups: dummyMeetups
+    }
+  }
+}
 export default HomePage;
