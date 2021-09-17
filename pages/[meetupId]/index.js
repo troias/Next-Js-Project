@@ -1,5 +1,5 @@
 import MeetupDetail from '../../components/meetups/MeetupDetail'
-
+import { MongoClient, ObjectId } from 'mongodb'
 
 const MeetUpDetails = (props) => {
 
@@ -7,10 +7,10 @@ const MeetUpDetails = (props) => {
     return (
 
         <MeetupDetail
-            img=""
-            title=""
-            description=""
-            address="" />
+            img={props.meetupData.image}
+            title={props.meetupData.title}
+            description={props.meetupData.description}
+            address={props.meetupData.address} />
     )
 
 
@@ -18,33 +18,49 @@ const MeetUpDetails = (props) => {
 }
 
 export const getStaticPaths = async () => {
+
+    const client = await MongoClient.connect(`${process.env.NEXT_PUBLIC_MONGO_DB_HOST}${process.env.NEXT_PUBLIC_MONGO_DB_USERNAME}:${process.env.NEXT_PUBLIC_MONGO_DB_PASS}${process.env.NEXT_PUBLIC_MONGO_DB_HOST_CLUSTER}`)
+    const db = client.db()
+    const meetupCollection = db.collection('meetups')
+    const meetups = await meetupCollection.find({
+
+    }, {
+        _id: 1
+    }).toArray()
+  
+    client.close()
+
     return {
         fallback: false,
-        paths: [
-            {
-                params: { meetupId: 'm1' },
-                params: { meetupId: 'm2' }
-
+        paths: meetups.map(x => ({
+            params: {
+                meetupId: x._id.toString()
             }
-        ], 
-        
+        }))
+
     }
 }
 
 export const getStaticProps = async (ctx) => {
 
-    console.log("ctx", ctx)
     const meetupId = ctx.params.meetupId
-    console.log("meetupId", meetupId)
+
+    const client = await MongoClient.connect(`${process.env.NEXT_PUBLIC_MONGO_DB_HOST}${process.env.NEXT_PUBLIC_MONGO_DB_USERNAME}:${process.env.NEXT_PUBLIC_MONGO_DB_PASS}${process.env.NEXT_PUBLIC_MONGO_DB_HOST_CLUSTER}`)
+    const db = client.db()
+    const meetupCollection = db.collection('meetups')
+    const selectedMeetup = await meetupCollection.findOne({
+       _id: ObjectId(meetupId)    
+    })
+  
+    client.close()
+
     return {
         props: {
             meetupData: {
-                id: meetupId,
-                title: "first Meetup",
-                image:
-                    "https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg",
-                address: "42 ass Street",
-                description: "First meetup",
+                id: selectedMeetup._id.toString(), 
+                title: selectedMeetup.title,
+                image: selectedMeetup.image, 
+                description: selectedMeetup.description
             }
         },
         revalidate: 36000,
