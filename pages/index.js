@@ -1,4 +1,4 @@
-
+import Head from 'next/head'
 import { MongoClient } from "mongodb"
 import MeetupList from "../components/meetups/MeetupList";
 
@@ -12,7 +12,12 @@ const HomePage = (props) => {
 
   return (
     <>
-      <MeetupList meetups={ props.meetups} />
+      <Head>
+        <title> React Meetups</title>
+        <meta name="description" content="browse a list of react meetups"/>
+
+      </Head>
+      <MeetupList meetups={props.meetups} />
     </>
   );
 };
@@ -25,7 +30,7 @@ export const getStaticProps = async (ctx) => {
   const meetups = await meetupCollection.find().toArray()
   console.log(meetups)
   client.close()
-  
+
 
   return {
     props: {
@@ -36,7 +41,7 @@ export const getStaticProps = async (ctx) => {
         id: x._id.toString(),
       }))
     },
-    revalidate: 36000,
+    revalidate: 1,
   }
 }
 
