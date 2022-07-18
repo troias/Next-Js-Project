@@ -1,9 +1,10 @@
+import router, { useRouter } from 'next/router'
 import MeetupDetail from '../../components/meetups/MeetupDetail'
 import { MongoClient, ObjectId } from 'mongodb'
 import Head from 'next/head'
 
 const MeetUpDetails = (props) => {
-
+    const router = useRouter()
 
     return (
         <>
@@ -23,7 +24,8 @@ const MeetUpDetails = (props) => {
 
 }
 
-export const getStaticPaths = async () => {
+export const getStaticPaths = async (ctx) => {
+
 
     const client = await MongoClient.connect(`${process.env.NEXT_PUBLIC_MONGO_DB_HOST}${process.env.NEXT_PUBLIC_MONGO_DB_USERNAME}:${process.env.NEXT_PUBLIC_MONGO_DB_PASS}${process.env.NEXT_PUBLIC_MONGO_DB_HOST_CLUSTER}`)
     const db = client.db()
@@ -45,19 +47,34 @@ export const getStaticPaths = async () => {
         }))
 
     }
+
+
+
+
 }
 
 export const getStaticProps = async (ctx) => {
 
+
     const meetupId = ctx.params.meetupId
+
     const client = await MongoClient.connect(`${process.env.NEXT_PUBLIC_MONGO_DB_HOST}${process.env.NEXT_PUBLIC_MONGO_DB_USERNAME}:${process.env.NEXT_PUBLIC_MONGO_DB_PASS}${process.env.NEXT_PUBLIC_MONGO_DB_HOST_CLUSTER}`)
+ 
     const db = client.db()
     const meetupCollection = db.collection('meetups')
     const selectedMeetup = await meetupCollection.findOne({
         _id: ObjectId(meetupId)
+    }).catch(err => {
+        return {notFound: true}
     })
 
+    if (!selectedMeetup) {
+      
+    }
     client.close()
+
+
+
 
     return {
         props: {
@@ -71,6 +88,7 @@ export const getStaticProps = async (ctx) => {
         },
         revalidate: 36000,
     }
+
 }
 
 
